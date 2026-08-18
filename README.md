@@ -114,7 +114,7 @@ That's it. Every push and PR gets its `.bib` files checked, pull requests get a 
 
 ## Keeping false positives down
 
-A checker that cries wolf gets muted, so a large share of the code exists to *not* complain. Journal names are stem-normalized (`Phys. Rev. Lett.` is `Physical Review Letters`). Fields missing on either side are never compared. Online-first offsets get ±1 year of slack when volume or pages agree. First-page-only citations pass silently (`pages={2863}` matches a record of `2863-2866`), as do leading zeros (`061` is `61`). Title-based lookups must clear a version gate and a first-author gate before any field gets compared, and DBLP's separate records for reprints (a NIPS 2012 original vs its CACM 2017 reprint) are disambiguated by year. Network errors and rate limits report "check failed, retry"; only a confirmed 404 is reported as missing.
+A checker that cries wolf gets muted, so a large share of the code exists to *not* complain. Journal names are stem-normalized (`Phys. Rev. Lett.` is `Physical Review Letters`). Fields missing on either side are never compared. Online-first offsets get ±1 year of slack when volume or pages agree. First-page-only citations pass silently (`pages={2863}` matches a record of `2863-2866`), as do leading zeros (`061` is `61`) and article numbers written as in the DOI suffix (`aat9004` from `10.1126/sciadv.aat9004`, where the publisher records `eaat9004`). Title-based lookups must clear a version gate and a first-author gate before any field gets compared, and DBLP's separate records for reprints (a NIPS 2012 original vs its CACM 2017 reprint) are disambiguated by year. Network errors and rate limits report "check failed, retry"; only a confirmed 404 is reported as missing.
 
 ## Tests
 
@@ -125,7 +125,7 @@ python tests/test_tex.py     # --tex filtering, ghost keys, comment handling
 python tests/test_bbl.py     # .bbl parsing and planted-error reproduction
 ```
 
-Fixtures are synthetic and use famous public papers, so expectations are stable: `ref_fixed.bib` must stay at zero findings, `ref_broken.bib` plants four errors plus a wrong issue number plus a missing DOI, and `sample.bbl` plants an arXiv-ID conflict and a truncated article number.
+Fixtures are synthetic and use famous public papers, so expectations are stable: `ref_fixed.bib` must stay at zero findings, `ref_broken.bib` plants four errors plus a wrong issue number plus a missing DOI, and `sample.bbl` plants an arXiv-ID conflict and an off-by-one first page — while `gao2018quantum`'s article number written as in the DOI suffix (`aat9004` vs the publisher's `eaat9004`) must stay *clean*, locking in that exemption.
 
 ## Layout
 

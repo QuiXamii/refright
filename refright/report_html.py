@@ -62,8 +62,8 @@ a{color:var(--info);text-decoration:none}a:hover{text-decoration:underline}
 .fix .fname{color:var(--mut);font-size:12.5px;margin-right:4px}
 .fix .note{color:var(--mut);font-size:12.5px;margin-top:5px}
 details.card summary{list-style:none;cursor:pointer}details.card summary::-webkit-details-marker{display:none}
-details.card summary::after{content:"▸ 展开核查细节";color:var(--mut);font-size:12px;margin-top:2px}
-details.card[open] summary::after{content:"▾ 收起"}
+details.card summary::after{content:"▸ Show check details";color:var(--mut);font-size:12px;margin-top:2px}
+details.card[open] summary::after{content:"▾ Collapse"}
 .hidden{display:none!important}
 footer{text-align:center;color:var(--mut);font-size:12px;margin:30px 0}
 """
@@ -111,7 +111,7 @@ def render_html(results: list[EntryResult], entries, bib_path: str,
         for f in r.findings:
             rows = []
             for ev in f.evidence:
-                link = f'<a href="{_esc(ev.url)}" target="_blank" rel="noopener">核实 ↗</a>' if ev.url else ""
+                link = f'<a href="{_esc(ev.url)}" target="_blank" rel="noopener">verify ↗</a>' if ev.url else ""
                 rows.append(
                     f'<tr><td><code>{_esc(ev.field)}</code></td>'
                     f'<td class="bibv"><code>{_esc(ev.bib_value)}</code></td>'
@@ -123,18 +123,18 @@ def render_html(results: list[EntryResult], entries, bib_path: str,
                    and f.evidence[0].ref_value == f.fix.ref_value)
             table = ""
             if rows and not dup:
-                table = ('<table class="ev"><tr><th>字段</th><th>bib 中的值</th>'
-                         '<th>数据库记录</th><th>来源</th><th>人工核实</th></tr>' + "".join(rows) + "</table>")
+                table = ('<table class="ev"><tr><th>Field</th><th>In your bib</th>'
+                         '<th>Database record</th><th>Source</th><th>Verify</th></tr>' + "".join(rows) + "</table>")
             fix_html = ""
             if f.fix:
-                link = (f'<a href="{_esc(f.fix.url)}" target="_blank" rel="noopener">核实 ↗</a>'
+                link = (f'<a href="{_esc(f.fix.url)}" target="_blank" rel="noopener">verify ↗</a>'
                         if f.fix.url else "")
                 if f.suggestion:
                     note = f'<div class="note">💡 {_esc(f.suggestion)}</div>'
                 else:
-                    note = f'<div class="note">数据源：{_esc(f.fix.source)}</div>'
+                    note = f'<div class="note">Source: {_esc(f.fix.source)}</div>'
                 fix_html = (
-                    f'<div class="fix"><span class="flabel">🔧 建议修正</span>'
+                    f'<div class="fix"><span class="flabel">🔧 Suggested fix</span>'
                     f'<span class="fname">{_esc(f.fix.field)}:</span>'
                     f'<code class="old">{_esc(f.fix.bib_value)}</code>'
                     f'<span class="arrow">→</span>'
@@ -146,7 +146,7 @@ def render_html(results: list[EntryResult], entries, bib_path: str,
                 f'<div class="finding"><div class="fmsg">{_SEV_LABEL[f.severity]} '
                 f'<code>[{_esc(f.code)}]</code> {_esc(f.message)}</div>{table}{fix_html}</div>')
 
-        prov = f'核查来源: {", ".join(r.checked_by) or "—"}'
+        prov = f'Checked by: {", ".join(r.checked_by) or "—"}'
         bibmeta = _bibmeta(r, e) if e else ""
         head = (f'<div class="chead"><span class="key">{_esc(r.key)}</span>'
                 f'<span class="badge">{_esc(r.entry_type)}</span>'
@@ -163,24 +163,24 @@ def render_html(results: list[EntryResult], entries, bib_path: str,
 
     ts = datetime.now().strftime("%Y-%m-%d %H:%M")
     return f"""<!doctype html>
-<html lang="zh"><head><meta charset="utf-8">
+<html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>refright 核查报告 — {_esc(Path(bib_path).name)}</title>
+<title>refright report — {_esc(Path(bib_path).name)}</title>
 <style>{CSS}</style></head><body>
 <header>
-  <h1>refright 参考文献核查报告</h1>
-  <div class="meta">文件: {_esc(bib_path)} ・ 生成: {ts} ・ refright v{__version__} ・ 数据源: Crossref / OpenAlex / arXiv / DBLP</div>
-  {f'<div class="meta">🔎 引用过滤: {_esc(tex_note)}</div>' if tex_note else ''}
+  <h1>refright bibliography report</h1>
+  <div class="meta">File: {_esc(bib_path)} · Generated: {ts} · refright v{__version__} · Sources: Crossref / OpenAlex / arXiv / DBLP</div>
+  {f'<div class="meta">🔎 Citation filter: {_esc(tex_note)}</div>' if tex_note else ''}
   <div class="chips">
-    <span class="chip on" data-sev="all" onclick="setSev('all',this)">全部 {len(results)}</span>
+    <span class="chip on" data-sev="all" onclick="setSev('all',this)">All {len(results)}</span>
     <span class="chip" data-sev="error" onclick="setSev('error',this)">❌ {counts[Severity.ERROR]}</span>
     <span class="chip" data-sev="warning" onclick="setSev('warning',this)">⚠️ {counts[Severity.WARNING]}</span>
     <span class="chip" data-sev="info" onclick="setSev('info',this)">ℹ️ {counts[Severity.INFO]}</span>
     <span class="chip" data-sev="ok" onclick="setSev('ok',this)">✅ {counts[Severity.OK]}</span>
   </div>
-  <input id="q" placeholder="按 bib key 或标题搜索…">
+  <input id="q" placeholder="Search by bib key or title…">
 </header>
 <main>{''.join(cards)}</main>
-<footer>证据表中 <span style="color:#991b1b">红色 = bib 当前值</span>，<span style="color:#065f46">绿色 = 数据库记录值</span> ・ 每条结论可点击"核实 ↗"跳转出版方/数据库页面人工复核 ・ 由 refright 自动生成</footer>
+<footer>In evidence tables, <span style="color:#991b1b">red = your bib value</span>, <span style="color:#065f46">green = database record</span> · every conclusion carries a "verify ↗" link to the publisher/database page for manual review · generated by refright</footer>
 <script>{JS}</script>
 </body></html>"""

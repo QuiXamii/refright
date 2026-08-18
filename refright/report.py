@@ -17,7 +17,7 @@ def print_summary(results: list[EntryResult], out=sys.stdout) -> None:
     for r in results:
         counts[r.severity] += 1
     print(f"\n{'═' * 72}", file=out)
-    print(f"共 {len(results)} 条 | {_COLOR[Severity.OK]}✅ {counts[Severity.OK]}{_RESET} "
+    print(f"{len(results)} entries | {_COLOR[Severity.OK]}✅ {counts[Severity.OK]}{_RESET} "
           f"{_COLOR[Severity.INFO]}ℹ️  {counts[Severity.INFO]}{_RESET} "
           f"{_COLOR[Severity.WARNING]}⚠️  {counts[Severity.WARNING]}{_RESET} "
           f"{_COLOR[Severity.ERROR]}❌ {counts[Severity.ERROR]}{_RESET}", file=out)
@@ -33,7 +33,7 @@ def print_compact(results: list[EntryResult], out=sys.stdout) -> None:
         top = [f for f in r.findings if f.severity == r.severity]
         codes = ", ".join(dict.fromkeys(f.code for f in top))
         msg = top[0].message if top else (r.findings[0].message if r.findings else "")
-        extra = f"（另 {len(r.findings) - len(top)} 条次要发现）" if len(r.findings) > len(top) else ""
+        extra = f" (+{len(r.findings) - len(top)} more minor findings)" if len(r.findings) > len(top) else ""
         print(f"{c}{_LABEL[r.severity]}{_RESET} {r.key}  [{codes}] {msg}{extra}", file=out)
     print_summary(results, out)
 
@@ -59,15 +59,15 @@ def print_report(results: list[EntryResult], quiet: bool = False, out=sys.stdout
                    and f.evidence[0].ref_value == f.fix.ref_value)
             if not dup:
                 for ev in f.evidence:
-                    print(f"         {ev.field}: bib = {ev.bib_value!r}  →  记录 = {ev.ref_value!r}  ({ev.source})",
+                    print(f"         {ev.field}: bib = {ev.bib_value!r}  →  record = {ev.ref_value!r}  ({ev.source})",
                           file=out)
                     if ev.url:
-                        print(f"           核实: {ev.url}", file=out)
+                        print(f"           verify: {ev.url}", file=out)
             if f.fix:
-                print(f"         🔧 建议修正: {f.fix.field}: {f.fix.bib_value}  →  {f.fix.ref_value}",
+                print(f"         🔧 suggested fix: {f.fix.field}: {f.fix.bib_value}  →  {f.fix.ref_value}",
                       file=out)
                 if f.fix.url:
-                    print(f"           核实: {f.fix.url}", file=out)
+                    print(f"           verify: {f.fix.url}", file=out)
             if f.suggestion:
                 print(f"         💡 {f.suggestion}", file=out)
     print_summary(results, out)

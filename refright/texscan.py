@@ -23,7 +23,7 @@ def _tex_files(paths: list[str]) -> list[Path]:
         elif pp.is_file():
             files.append(pp)
         else:
-            raise FileNotFoundError(f"--tex 路径不存在: {p}")
+            raise FileNotFoundError(f"--tex path does not exist: {p}")
     return files
 
 

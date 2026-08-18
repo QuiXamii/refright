@@ -71,7 +71,7 @@ def main() -> int:
     print(f"\n[html] {html_out.name}: {len(doc)} bytes")
     for marker in ["LeCun2015", "10.1038/nature14539",
                    "124-134", "533-536", "Vaswani2017",
-                   "核实 ↗", "核查来源"]:
+                   "verify ↗", "Checked by"]:
         if marker not in doc:
             ok = False
             print(f"  HTML MISSING: {marker}")

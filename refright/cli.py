@@ -41,7 +41,7 @@ def make_progress():
         if is_tty:
             filled = int(20 * done / total)
             bar = "█" * filled + "░" * (20 - filled)
-            line = (f"[{done}/{total}] {bar} {pct}% | 已用 {_fmt_secs(elapsed)} "
+            line = (f"[{done}/{total}] {bar} {pct}% | elapsed {_fmt_secs(elapsed)} "
                     f"ETA {_fmt_secs(eta)} | ❌{tallies[Severity.ERROR]} "
                     f"⚠️{tallies[Severity.WARNING]} ℹ️{tallies[Severity.INFO]} | {r.key}")
             print("\r" + line.ljust(width)[:width], end="", file=sys.stderr, flush=True)
@@ -88,16 +88,16 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     if (args.write or args.fix_out) and not args.fix:
-        ap.error("--write/--fix-out 必须与 --fix 一起使用")
+        ap.error("--write/--fix-out require --fix")
 
     head = Path(args.bib).read_text(encoding="utf-8", errors="replace")[:200_000]
     from .bblparser import looks_like_bbl, parse_bbl
     is_bbl = args.bib.lower().endswith(".bbl") or looks_like_bbl(head)
     if is_bbl and args.fix:
-        ap.error("--fix 仅支持 .bib 源文件；.bbl 是编译产物，请修正生成它的 .bib 后重新编译")
+        ap.error("--fix only supports .bib sources; .bbl is a build artifact — fix the .bib that generated it and recompile")
 
     entries = parse_bbl(args.bib) if is_bbl else parse_bib(args.bib)
-    all_entries = entries  # HTML 报告需要完整条目表（含未引用条目）来展示 bib 字段
+    all_entries = entries  # the HTML report needs the full entry list (incl. uncited) to show bib fields
 
     uncited: list = []
     missing_keys: list[str] = []
@@ -105,19 +105,19 @@ def main(argv: list[str] | None = None) -> int:
         from .texscan import cited_keys
         cited, cite_all = cited_keys(args.tex)
         if cite_all:
-            print(f"refright: 检测到 \\nocite{{*}}，按全部 {len(entries)} 条核查…", file=sys.stderr)
+            print(f"refright: detected \\nocite{{*}}, checking all {len(entries)} entries…", file=sys.stderr)
         else:
             cited_set = set(cited)
             bib_keys = {e.key for e in entries}
             missing_keys = [k for k in cited if k not in bib_keys]
             uncited = [e for e in entries if e.key not in cited_set]
             entries = [e for e in entries if e.key in cited_set]
-            print(f"refright: --tex 实际引用 {len(cited)} 条；bib 共 {len(entries) + len(uncited)} 条，"
-                  f"{len(uncited)} 条未引用跳过核查，{len(missing_keys)} 个引用 key 在 bib 中不存在",
+            print(f"refright: --tex: {len(cited)} keys actually cited; bib has {len(entries) + len(uncited)} entries, "
+                  f"{len(uncited)} uncited skipped, {len(missing_keys)} cited keys missing from the bib",
                   file=sys.stderr)
 
-    print(f"refright: 核查 {len(entries)} 条文献（{'bbl' if is_bbl else 'bib'} 格式，"
-          f"{args.workers} 路并发）…", file=sys.stderr)
+    print(f"refright: checking {len(entries)} references ({'bbl' if is_bbl else 'bib'} format, "
+          f"{args.workers} workers)…", file=sys.stderr)
 
     cache = Cache(enabled=not args.no_cache)
     t0 = time.time()
@@ -126,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:
                                           progress=make_progress())
     finally:
         cache.close()
-    print(f"核查完成，用时 {_fmt_secs(time.time() - t0)}", file=sys.stderr)
+    print(f"done in {_fmt_secs(time.time() - t0)}", file=sys.stderr)
 
     if args.tex and missing_keys:
         from .models import FieldDiff, Finding
@@ -134,8 +134,8 @@ def main(argv: list[str] | None = None) -> int:
             r = EntryResult(key=k, entry_type="(missing)", title="")
             r.findings.append(Finding(
                 Severity.ERROR, "cited-not-in-bib",
-                "正文引用了该 key，但 bib 中不存在此条目（编译会产生未定义引用）",
-                evidence=[FieldDiff("key", k, "bib 中不存在", "tex", "")]))
+                "cited in the .tex file(s), but no such entry exists in the bib (compiling would produce undefined citations)",
+                evidence=[FieldDiff("key", k, "missing from bib", "tex", "")]))
             results.insert(0, r)
     if uncited:
         from .models import FieldDiff, Finding
@@ -143,7 +143,7 @@ def main(argv: list[str] | None = None) -> int:
             r = EntryResult(key=e.key, entry_type=e.entry_type, title=e.title)
             r.findings.append(Finding(
                 Severity.INFO, "not-cited",
-                "条目未被 --tex 指定的文档引用，未核查（可考虑从 bib 中清理）"))
+                "not cited by the --tex document(s); skipped — consider removing it from the bib"))
             results.append(r)
 
     if args.verbose:
@@ -154,7 +154,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         with open(args.json, "w", encoding="utf-8") as fh:
             fh.write(to_json(results))
-        print(f"JSON 报告已写入 {args.json}", file=sys.stderr)
+        print(f"JSON report written to {args.json}", file=sys.stderr)
 
     html_path = args.html
     if html_path is None and not args.no_html:
@@ -164,33 +164,33 @@ def main(argv: list[str] | None = None) -> int:
         from .report_html import render_html
         tex_note = ""
         if args.tex:
-            tex_note = (f"--tex {', '.join(args.tex)}：实际引用 {len(entries)} 条已核查，"
-                        f"{len(uncited)} 条未引用未核查，"
-                        f"{len(missing_keys)} 个引用 key 在 bib 中缺失")
+            tex_note = (f"--tex {', '.join(args.tex)}: {len(entries)} cited entries checked, "
+                        f"{len(uncited)} uncited skipped, "
+                        f"{len(missing_keys)} cited keys missing from the bib")
         with open(html_path, "w", encoding="utf-8") as fh:
             fh.write(render_html(results, all_entries, args.bib, tex_note=tex_note))
-        print(f"HTML 报告已写入 {html_path}（--no-html 关闭，-v 看完整终端报告）", file=sys.stderr)
+        print(f"HTML report written to {html_path} (--no-html to disable, -v for the full terminal report)", file=sys.stderr)
 
     if args.fix:
         fixes = collect_fixes(results, include_warnings=args.fix_warnings)
         if not fixes:
-            print("\n--fix: 没有可自动修复的问题（WARNING 级需加 --fix-warnings）", file=sys.stderr)
+            print("\n--fix: nothing auto-fixable (WARNING-level fixes need --fix-warnings)", file=sys.stderr)
         else:
             old_text = Path(args.bib).read_text(encoding="utf-8")
             new_text, changes = apply_fixes(old_text, fixes)
             n_entries = len(fixes)
-            print(f"\n--fix: {len(changes)} 处可自动修复，涉及 {n_entries} 个条目：", file=sys.stderr)
+            print(f"\n--fix: {len(changes)} auto-fixable fields across {n_entries} entries:", file=sys.stderr)
             for c in changes:
                 print(f"  [{c.code}] {c.key}: {c.field}: {c.old} → {c.new}", file=sys.stderr)
             if args.write or args.fix_out:
                 written = write_fixed(args.bib, new_text, args.fix_out)
                 if args.fix_out:
-                    print(f"修复后的 bib 已写入 {written}（原文件未动）", file=sys.stderr)
+                    print(f"fixed bib written to {written} (original untouched)", file=sys.stderr)
                 else:
-                    print(f"已原地修复 {written}（原文件已备份为时间戳 .bak）", file=sys.stderr)
-                print("建议重新运行 refright 复查修复结果。", file=sys.stderr)
+                    print(f"fixed {written} in place (original backed up as a timestamped .bak)", file=sys.stderr)
+                print("Re-run refright to double-check the result.", file=sys.stderr)
             else:
-                print("\n--- diff 预览（dry-run，未写入任何文件；加 --write 原地修复或 --fix-out PATH 另存）---",
+                print("\n--- diff preview (dry run; nothing written — use --write to apply in place or --fix-out PATH to save elsewhere) ---",
                       file=sys.stderr)
                 print(unified_diff(old_text, new_text, Path(args.bib).name))
 

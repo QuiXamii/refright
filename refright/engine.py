@@ -1,6 +1,6 @@
 """Verification engine: compares each bib entry against authoritative sources.
 
-False-positive control rules (see README §误报控制):
+False-positive control rules (see README §Keeping false positives down):
 - journal abbreviations are normalized before comparison
 - fields missing on either side are skipped, never flagged
 - online-first year differences (<=1 yr) pass when volume or pages match
@@ -74,7 +74,7 @@ class Engine:
             if others:
                 r.findings.insert(0, Finding(
                     Severity.ERROR, "arxiv-id-conflict",
-                    "条目中出现两个不同的 arXiv 编号（正文编号与链接不一致）",
+                    "two different arXiv ids in one entry (printed id and hyperlink disagree)",
                     evidence=[FieldDiff("arxiv", aid, " / ".join(others), "bib", "")]))
             return r
         return self.check_no_id_entry(e)
@@ -112,7 +112,7 @@ class Engine:
                         r = EntryResult(key=entries[i].key, entry_type=entries[i].entry_type,
                                         title=entries[i].title)
                         r.findings.append(Finding(Severity.WARNING, "check-failed",
-                                                  f"核查过程出错（{type(exc).__name__}），需人工核查"))
+                                                  f"check failed ({type(exc).__name__}); needs manual review"))
                         results[i] = r
                     done += 1
                     if progress:
@@ -124,8 +124,8 @@ class Engine:
                 if res.key in dup_keys:
                     res.findings.insert(0, Finding(
                         Severity.WARNING, "duplicate-key",
-                        "该引用 key 在 bib 中重复定义，BibTeX 只会使用其中一个，需人工合并",
-                        evidence=[FieldDiff("key", res.key, "重复定义", "bib", "")]))
+                        "duplicate bib key: BibTeX uses only one of the definitions; merge them manually",
+                        evidence=[FieldDiff("key", res.key, "defined more than once", "bib", "")]))
         return out
 
     # ---------- entry types ----------
@@ -137,7 +137,7 @@ class Engine:
         if clean != doi:
             r.findings.append(Finding(
                 Severity.INFO, "doi-url-prefix",
-                "DOI 字段写成了完整 URL，建议只保留 DOI 本体",
+                "the doi field holds a full URL; keep only the DOI itself",
                 evidence=[FieldDiff("doi", doi, clean, "bib", "")],
                 fix=FieldDiff("doi", doi, clean, "bib", "")))
             doi = clean
@@ -147,25 +147,25 @@ class Engine:
             if status == "error":
                 r.findings.append(Finding(
                     Severity.WARNING, "doi-check-failed",
-                    "DOI 核查请求失败（网络错误或限流），无法确认，建议稍后重试",
+                    "DOI check request failed (network error or rate limit); cannot confirm — retry later",
                     evidence=[FieldDiff("doi", doi, "request failed", "crossref", doi_url)]))
                 return r
             f = Finding(Severity.ERROR, "doi-unresolvable",
-                        "DOI 无法解析（HTTP 404）",
-                        evidence=[FieldDiff("doi", doi, "HTTP 404 无法解析", "crossref", doi_url)])
+                        "DOI does not resolve (HTTP 404)",
+                        evidence=[FieldDiff("doi", doi, "HTTP 404 unresolvable", "crossref", doi_url)])
             # not all DOIs live in Crossref — figshare/Zenodo/… use DataCite
             dc, dc_status = self.datacite.get(doi)
             if dc is not None:
                 r.checked_by.append("datacite")
                 f = Finding(Severity.INFO, "datacite-doi",
-                            "DOI 注册在 DataCite（数据集/预印本仓库），已确认存在",
-                            evidence=[FieldDiff("doi", doi, dc.get("title") or "存在",
+                            "DOI is registered with DataCite (dataset/preprint repository); existence confirmed",
+                            evidence=[FieldDiff("doi", doi, dc.get("title") or "exists",
                                                 "datacite", doi_url)])
                 if e.title and dc.get("title") and \
                         title_sim(e.title, dc["title"]) < TITLE_MATCH_THRESHOLD:
                     r.findings.append(Finding(
                         Severity.WARNING, "title-mismatch",
-                        "DOI 指向的资源与条目标题不符（DOI 可能张冠李戴）",
+                        "title does not match the resource this DOI points to (DOI may belong to a different work)",
                         evidence=[FieldDiff("title", e.title, dc["title"], "datacite", doi_url)]))
                     return r
             else:
@@ -173,7 +173,7 @@ class Engine:
                 if cand:
                     f.fix = FieldDiff("doi", doi, cand.get("DOI", ""),
                                       "crossref-search", f"https://doi.org/{cand.get('DOI')}")
-                    f.suggestion = f"按标题反查到正确记录：{_cr_summary(cand)}"
+                    f.suggestion = f"reverse lookup by title found: {_cr_summary(cand)}"
             r.findings.append(f)
             return r
         self._compare_with_crossref(e, cr, r, doi_url)
@@ -188,24 +188,24 @@ class Engine:
             if not arxiv_ok:
                 r.findings.append(Finding(
                     Severity.WARNING, "arxiv-check-failed",
-                    "arXiv API 请求失败（网络错误/限流），无法确认编号，建议稍后重试",
+                    "arXiv API request failed (network error / rate limit); cannot confirm the id — retry later",
                     evidence=[FieldDiff("arxiv", aid, "request failed", "arxiv", url)]))
                 return r
             r.findings.append(Finding(
                 Severity.ERROR, "arxiv-id-not-found",
-                "arXiv 编号不存在",
+                "arXiv id does not exist",
                 evidence=[FieldDiff("arxiv", aid, "not found", "arxiv", url)]))
             return r
         if title_sim(e.title, rec["title"]) < TITLE_MATCH_THRESHOLD:
             r.findings.append(Finding(
                 Severity.ERROR, "arxiv-id-mismatch",
-                "arXiv 编号指向的论文与条目标题不符",
+                "the arXiv id points to a paper with a different title",
                 evidence=[FieldDiff("title", e.title, rec["title"], "arxiv", url)]))
             return r
         if rec.get("doi") or rec.get("journal_ref"):
             r.findings.append(Finding(
                 Severity.INFO, "published-version-available",
-                "已有正式出版版本，建议更新条目",
+                "a published version exists; consider updating the entry",
                 evidence=[FieldDiff("status", "preprint",
                                     rec.get("journal_ref") or rec.get("doi"), "arxiv", url)]))
         bib_year = e.fields.get("year", "")
@@ -213,7 +213,7 @@ class Engine:
             if abs(int(bib_year) - int(rec["published"][:4])) > 1:
                 r.findings.append(Finding(
                     Severity.WARNING, "arxiv-year-mismatch",
-                    "年份与 arXiv 提交年份相差超过 1 年",
+                    "year differs from the arXiv submission year by more than 1",
                     evidence=[FieldDiff("year", bib_year, rec["published"][:4], "arxiv", url)]))
         return r
 
@@ -221,16 +221,16 @@ class Engine:
         r = EntryResult(key=e.key, entry_type=e.entry_type, title=e.title)
         if e.entry_type == "article" and e.fields.get("journal"):
             r.checked_by.append("crossref-search")
-            f = Finding(Severity.INFO, "missing-doi", "期刊论文缺少 DOI 字段")
+            f = Finding(Severity.INFO, "missing-doi", "journal article has no DOI field")
             cand = self._reverse_lookup(e.title)
             if cand:
                 url = f"https://doi.org/{cand.get('DOI')}"
                 if self._reverse_gates(e, cand, r, url):
-                    f.suggestion = f"按标题匹配到记录（可能为不同版本/重印）：{_cr_summary(cand)}"
+                    f.suggestion = f"title-matched record (possibly a different edition/reprint): {_cr_summary(cand)}"
                 else:
-                    f.fix = FieldDiff("doi", "(缺失)", cand.get("DOI", ""),
+                    f.fix = FieldDiff("doi", "(missing)", cand.get("DOI", ""),
                                       "crossref-search", url)
-                    f.suggestion = f"按标题匹配到记录：{_cr_summary(cand)}"
+                    f.suggestion = f"title-matched record: {_cr_summary(cand)}"
                     self._compare_with_crossref(e, cand, r, url,
                                                 skip_title=True, relaxed=True)
             r.findings.append(f)
@@ -245,14 +245,14 @@ class Engine:
             if bp and hp and bp != hp:
                 r.findings.append(Finding(
                     Severity.ERROR, "pages-mismatch",
-                    "页码与 DBLP 记录不符",
+                    "pages do not match the DBLP record",
                     evidence=[FieldDiff("pages", e.fields.get("pages", ""), hp, "dblp", url)],
                     fix=FieldDiff("pages", e.fields.get("pages", ""), hp, "dblp", url)))
             by, hy = e.fields.get("year", ""), str(hit.get("year", ""))
             if by and hy and abs(int(by) - int(hy)) > 1:
                 r.findings.append(Finding(
                     Severity.ERROR, "year-mismatch",
-                    "年份与 DBLP 记录不符",
+                    "year does not match the DBLP record",
                     evidence=[FieldDiff("year", by, hy, "dblp", url)],
                     fix=FieldDiff("year", by, hy, "dblp", url)))
             return r
@@ -265,13 +265,13 @@ class Engine:
                                         skip_title=True, relaxed=True)
             if not r.findings:
                 r.findings.append(Finding(Severity.INFO, "identified-via-title",
-                                          "无标识条目已通过标题匹配到 Crossref 记录，元数据一致",
+                                          "id-less entry matched a Crossref record by title; metadata is consistent",
                                           evidence=[FieldDiff("record", "(no doi)",
                                                               _cr_summary(cand), "crossref-search",
                                                               url)]))
             return r
         r.findings.append(Finding(Severity.WARNING, "not-found-in-databases",
-                                  "未在 Crossref/DBLP 检到此条目，需人工核查"))
+                                  "not found in Crossref/DBLP; needs manual review"))
         return r
 
     # ---------- field comparison against a Crossref record ----------
@@ -289,7 +289,7 @@ class Engine:
         if not skip_title and f.get("title") and title_sim(f["title"], cr_title) < TITLE_MATCH_THRESHOLD:
             r.findings.append(Finding(
                 Severity.ERROR, "title-mismatch",
-                "DOI 指向的论文与条目标题不符（DOI 可能张冠李戴）",
+                "the DOI points to a paper with a different title (possible mix-up)",
                 evidence=[FieldDiff("title", f["title"], cr_title, "crossref", url)]))
             return  # DOI points elsewhere; further field comparison is meaningless
 
@@ -297,7 +297,7 @@ class Engine:
         if (not relaxed and e.entry_type == "article" and f.get("journal") and cr_j
                 and not journal_match(f["journal"], cr_j)):
             r.findings.append(Finding(
-                Severity.WARNING, "journal-mismatch", "期刊名与记录不符",
+                Severity.WARNING, "journal-mismatch", "journal name does not match the record",
                 evidence=[FieldDiff("journal", f["journal"], cr_j, "crossref", url)]))
 
         vol_matched = True
@@ -307,17 +307,17 @@ class Engine:
                 vol_matched = False
                 r.findings.append(Finding(
                     Severity.ERROR, "volume-mismatch",
-                    "卷号与出版方记录不符",
+                    "volume does not match the publisher record",
                     evidence=[FieldDiff("volume", str(f["volume"]), cr_vol, "crossref", url)],
                     fix=FieldDiff("volume", str(f["volume"]), cr_vol, "crossref", url)))
 
         cr_issue = str(cr.get("issue") or "")
-        issue_key = "issue" if "issue" in f else "number"  # BibTeX 用 number 表期号
+        issue_key = "issue" if "issue" in f else "number"  # BibTeX spells "issue" as "number"
         bib_issue = str(f.get(issue_key) or "")
         if not relaxed and bib_issue and cr_issue and bib_issue != cr_issue:
             r.findings.append(Finding(
                 Severity.WARNING, "issue-mismatch",
-                "期号与出版方记录不符",
+                "issue does not match the publisher record",
                 evidence=[FieldDiff(issue_key, bib_issue, cr_issue, "crossref", url)],
                 fix=FieldDiff(issue_key, bib_issue, cr_issue, "crossref", url)))
 
@@ -337,7 +337,7 @@ class Engine:
                     page_matched = False
                     r.findings.append(Finding(
                         Severity.ERROR, "pages-mismatch",
-                        "页码与出版方记录不符",
+                        "pages do not match the publisher record",
                         evidence=[FieldDiff("pages", f["pages"], cr_page, "crossref", url)],
                         fix=FieldDiff("pages", f["pages"], cr_page, "crossref", url)))
 
@@ -352,7 +352,7 @@ class Engine:
                 elif diff <= 1:
                     r.findings.append(Finding(
                         Severity.WARNING, "year-online-first",
-                        "年份与在线首发年份相差 1 年（可能为正式卷期年份，请确认）",
+                        "year is 1 off the online-first year (may be the formal issue year — please confirm)",
                         evidence=[FieldDiff("year", by, "/".join(map(str, sorted(yrs))),
                                             "crossref", url)]))
                 else:
@@ -362,7 +362,7 @@ class Engine:
                                    and cr[f]["date-parts"][0] and cr[f]["date-parts"][0][0]), "")
                     r.findings.append(Finding(
                         Severity.ERROR, "year-mismatch",
-                        "年份与出版方记录不符",
+                        "year does not match the publisher record",
                         evidence=[FieldDiff("year", by, "/".join(map(str, sorted(yrs))),
                                             "crossref", url)],
                         fix=FieldDiff("year", by, target, "crossref", url) if target else None))
@@ -375,7 +375,7 @@ class Engine:
             ref_fam = norm_title(cr_authors[0].get("family", "")).replace(" ", "")
             if bib_sur and ref_fam and bib_sur not in ref_fam and ref_fam not in bib_sur:
                 r.findings.append(Finding(
-                    Severity.WARNING, "author-mismatch", "第一作者姓氏与记录不符",
+                    Severity.WARNING, "author-mismatch", "first-author surname does not match the record",
                     evidence=[FieldDiff("author", f["author"].split(" and ")[0],
                                         cr_authors[0].get("family", ""), "crossref", url)]))
 
@@ -395,7 +395,7 @@ class Engine:
             if yrs and min(abs(int(by) - y) for y in yrs) > 1:
                 r.findings.append(Finding(
                     Severity.WARNING, "possible-version-mismatch",
-                    "标题匹配到的记录年份相差超过 1 年，可能是重印版或不同版本，请人工确认",
+                    "title-matched record differs in year by more than 1 (reprint or different version?) — confirm manually",
                     evidence=[FieldDiff("year", by, "/".join(map(str, sorted(yrs))),
                                         "crossref-search", url)]))
                 return True
@@ -406,7 +406,7 @@ class Engine:
             if ref_fam and bib_sur not in ref_fam and ref_fam not in bib_sur:
                 r.findings.append(Finding(
                     Severity.WARNING, "unreliable-title-match",
-                    "标题匹配到的记录第一作者不符，可能是同名不同论文，请人工核查",
+                    "title-matched record has a different first author (same-title different paper?) — review manually",
                     evidence=[FieldDiff("author", e.fields["author"].split(" and ")[0],
                                         cr_authors[0].get("family", ""),
                                         "crossref-search", url)]))

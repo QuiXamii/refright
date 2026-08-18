@@ -1,6 +1,6 @@
 """Surgical, reversible auto-fix for .bib files.
 
-Safety contract (see README §自动修复):
+Safety contract (see README §Auto-fix):
 - never rewrites the whole file from parsed fields (formatting/comments survive)
 - only edits field values inside the targeted entry block
 - default mode is a dry-run diff; writing requires an explicit flag

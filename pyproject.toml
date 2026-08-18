@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "refright"
-version = "0.2.1"
+version = "0.3.0"
 description = "Verify the authenticity of every reference in .bib/.bbl files against Crossref, OpenAlex, arXiv, DBLP and DataCite."
 readme = "README.md"
 requires-python = ">=3.10"

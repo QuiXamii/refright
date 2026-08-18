@@ -105,7 +105,7 @@ jobs:
 
 ## 误报控制
 
-会乱叫的工具没人愿意用，所以大量代码花在"不报错"上。期刊名做词干归一化（`Phys. Rev. Lett.` 就是 `Physical Review Letters`）；任何一侧缺失的字段不参与比对；卷或页一致时容忍 online-first 的 ±1 年年份差；丛书卷号不比对；新旧 APS DOI 格式都认。首页式引用静默通过（bib `pages={2863}` 等于记录 `2863-2866`，记录只给首页也认），页码前导零归一化（`061` 就是 `61`）。标题反查一律走版本门和作者门，命不中同版本同作者就不做字段比对，只发 WARNING。DBLP 对重印版有独立记录，按年份一致性优选，NIPS 2012 原文不会被 2017 年 CACM 重印顶掉。BibTeX 的 `number` 自动别名到期号；`journal={arXiv:xxxx}` 预印本引用风格自动改走 arXiv 核查；Crossref 字段先做 HTML entity unescape（`&amp;` 就是 `&`）。网络错误和限流只报"核查失败请重试"，绝不伪装成 404。
+会乱叫的工具没人愿意用，所以大量代码花在"不报错"上。期刊名做词干归一化（`Phys. Rev. Lett.` 就是 `Physical Review Letters`）；任何一侧缺失的字段不参与比对；卷或页一致时容忍 online-first 的 ±1 年年份差；丛书卷号不比对；新旧 APS DOI 格式都认。首页式引用静默通过（bib `pages={2863}` 等于记录 `2863-2866`，记录只给首页也认），页码前导零归一化（`061` 就是 `61`），按 DOI 后缀写的文章号也认（`10.1126/sciadv.aat9004` 对应 `pages={aat9004}`，尽管出版方记录是 `eaat9004`）。标题反查一律走版本门和作者门，命不中同版本同作者就不做字段比对，只发 WARNING。DBLP 对重印版有独立记录，按年份一致性优选，NIPS 2012 原文不会被 2017 年 CACM 重印顶掉。BibTeX 的 `number` 自动别名到期号；`journal={arXiv:xxxx}` 预印本引用风格自动改走 arXiv 核查；Crossref 字段先做 HTML entity unescape（`&amp;` 就是 `&`）。网络错误和限流只报"核查失败请重试"，绝不伪装成 404。
 
 ## 测试
 
@@ -116,7 +116,7 @@ python tests/test_tex.py     # --tex：只核查实际引用条目；幽灵 key 
 python tests/test_bbl.py     # .bbl：合成 REVTeX fixture 解析；植入错误精确复现
 ```
 
-fixture 全部用公开经典论文合成，期望稳定：`ref_fixed.bib` 必须 0 error / 0 warning；`ref_broken.bib` 植入 4 处错误、1 处期号错误、1 处缺 DOI，必须精确复现；`sample.bbl` 植入 arXiv 编号正文/链接冲突和文章号丢首字母各一处，外加一条"标题被样式省略"的警告；`citations.tex` 是 `--tex` 过滤的夹具，含注释干扰和幽灵 key。
+fixture 全部用公开经典论文合成，期望稳定：`ref_fixed.bib` 必须 0 error / 0 warning；`ref_broken.bib` 植入 4 处错误、1 处期号错误、1 处缺 DOI，必须精确复现；`sample.bbl` 植入 arXiv 编号正文/链接冲突和首页差一页各一处，外加一条"标题被样式省略"的警告——其中 `gao2018quantum` 按 DOI 后缀写文章号（`aat9004`，出版方记录为 `eaat9004`）属合法写法，必须保持干净，作为该豁免规则的回归锁；`citations.tex` 是 `--tex` 过滤的夹具，含注释干扰和幽灵 key。
 
 ## 结构
 
