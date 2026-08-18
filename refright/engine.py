@@ -6,6 +6,7 @@ False-positive control rules (see README §误报控制):
 - online-first year differences (<=1 yr) pass when volume or pages match
 - book-series volumes (Crossref often lacks them) are never compared
 - article-number journals compare pages against article-number
+- article numbers cited as in the DOI suffix (aat9004 vs record eaat9004) pass
 """
 from __future__ import annotations
 
@@ -36,6 +37,20 @@ def _cr_summary(cr: dict) -> str:
     page = cr.get("page") or cr.get("article-number") or ""
     yrs = sorted(_cr_years(cr))
     return f"{jrnl} {vol}, {page} ({yrs[0] if yrs else '?'})"
+
+
+def _article_num_equiv(bp: str, rp: str, doi: str) -> bool:
+    """Article-number journals (Science Advances, Nature Communications, ...)
+    are cited in divergent styles: pages={eaat9004}, pages={aat9004} (exactly
+    as in the DOI suffix 10.1126/sciadv.aat9004), or with other leading-letter
+    variants. Accept the bib value when it equals the DOI suffix, or when it
+    differs from the publisher record only in leading letters."""
+    strip = lambda s: s.lstrip("abcdefghijklmnopqrstuvwxyz")
+    b, r_ = bp.lower(), rp.lower()
+    suffix = (doi or "").lower().rsplit(".", 1)[-1]
+    if suffix and "/" not in suffix and b == suffix:
+        return True
+    return bool(strip(b)) and strip(b) == strip(r_)
 
 
 class Engine:
@@ -316,6 +331,8 @@ class Engine:
                     pass  # first-page-only citation style: pages={2863} vs 2863-2866
                 elif "-" not in rp and bib_first == rp:
                     pass  # record lists only the first page: 255--282 vs 255
+                elif _article_num_equiv(bp, rp, f.get("doi", "")):
+                    pass  # article number as in DOI suffix: aat9004 vs record eaat9004
                 else:
                     page_matched = False
                     r.findings.append(Finding(

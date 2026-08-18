@@ -1,8 +1,11 @@
 % Synthetic .bbl fixture (REVTeX/apsrev4-1 style + one plain entry).
 % All entries describe famous public papers; two carry planted errors:
 %   gpt4report      arXiv link points to a different paper -> arxiv-id-mismatch ERROR
-%   gao2018quantum  article number lost its leading 'e'    -> pages-mismatch ERROR
+%   shor1994        first page off by one                  -> pages-mismatch ERROR
 %   zenke2017       title omitted by the bbl style         -> not-found-in-databases WARNING
+% gao2018quantum cites the article number exactly as it appears in the DOI
+% suffix (aat9004; Crossref records eaat9004): a legitimate style that must
+% NOT be flagged — regression lock for the article-number exemption.
 \begin{thebibliography}{7}%
 \providecommand \doibase [0]{http://dx.doi.org/}%
 \bibitem [{\citenamefont {LeCun}\ \emph {et~al.}(2015)\citenamefont {LeCun}, \citenamefont {Bengio},\ and\ \citenamefont {Hinton}}]{lecun2015deep}%
@@ -10,7 +13,7 @@
   \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Y.}~\bibnamefont {LeCun}}, \bibinfo {author} {\bibfnamefont {Y.}~\bibnamefont {Bengio}}, \ and\ \bibinfo {author} {\bibfnamefont {G.}~\bibnamefont {Hinton}},\ }\bibfield  {title} {Deep learning,\ }\href {\doibase 10.1038/nature14539} {\bibfield  {journal} {\bibinfo  {journal} {Nature}\ }\textbf {\bibinfo {volume} {521}},\ \bibinfo {pages} {436} (\bibinfo {year} {2015})}\BibitemShut {NoStop}%
 \bibitem [{\citenamefont {Shor}(1994)}]{shor1994}%
   \BibitemOpen
-  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {P.~W.}\ \bibnamefont {Shor}},\ }\bibfield  {title} {Algorithms for quantum computation: discrete logarithms and factoring,\ }\href {\doibase 10.1109/SFCS.1994.365700} {\bibinfo {booktitle} {Proceedings 35th Annual Symposium on Foundations of Computer Science},\ \bibinfo {pages} {124--134} (\bibinfo {year} {1994})}\BibitemShut {NoStop}%
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {P.~W.}\ \bibnamefont {Shor}},\ }\bibfield  {title} {Algorithms for quantum computation: discrete logarithms and factoring,\ }\href {\doibase 10.1109/SFCS.1994.365700} {\bibinfo {booktitle} {Proceedings 35th Annual Symposium on Foundations of Computer Science},\ \bibinfo {pages} {125--134} (\bibinfo {year} {1994})}\BibitemShut {NoStop}%
 \bibitem [{\citenamefont {OpenAI}(2023)}]{gpt4report}%
   \BibitemOpen
   \bibfield  {author} {\bibinfo {author} {\bibnamefont {OpenAI}},\ }\bibfield  {title} {GPT-4 technical report,\ }\href {https://arxiv.org/abs/2108.07258} {\bibfield  {journal} {\bibinfo  {journal} {arXiv:2303.08774}\ } (\bibinfo {year} {2023})}\BibitemShut {NoStop}%

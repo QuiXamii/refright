@@ -6,8 +6,11 @@ all famous public papers; \\bibfield/\\bibinfo markup + one plain-format entry).
 Planted issues:
   - gpt4report      arXiv id conflict (printed id vs hyperlink differ)
                     + arxiv-id-mismatch
-  - gao2018quantum  article number lost its leading 'e' -> pages-mismatch
+  - shor1994        first page off by one (125--134 vs record 124-134)
+                    -> pages-mismatch
   - zenke2017       title omitted by the bbl style -> not-found-in-databases
+  - gao2018quantum  cites article number as in the DOI suffix (aat9004 vs
+                    Crossref eaat9004): must stay CLEAN (regression lock)
 
 1. parser: 7 entries; structured fields extracted correctly (lecun2015deep);
    bare-title fallback works (chaudhry2018 has no \\bibfield{title})
@@ -66,7 +69,7 @@ def main() -> int:
                       if f["severity"] == "ERROR"}
             expect_errors = {("gpt4report", "arxiv-id-conflict"),
                              ("gpt4report", "arxiv-id-mismatch"),
-                             ("gao2018quantum", "pages-mismatch")}
+                             ("shor1994", "pages-mismatch")}
             print(f"[bbl] ERRORs: {sorted(errors)}")
             if errors != expect_errors:
                 print(f"[bbl] expect exactly {sorted(expect_errors)}")
