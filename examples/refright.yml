@@ -1,0 +1,26 @@
+# Copy this file into your paper repo as .github/workflows/refright.yml
+# It checks every .bib file on each push and pull request, comments a
+# summary on PRs, and fails the check when any reference has an ERROR.
+name: refright
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  pull-requests: write   # for the PR comment
+  contents: read
+
+jobs:
+  refright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: QuiXamii/refright@main
+        with:
+          files: "**/*.bib"     # add "**/*.bbl" if you keep compiled bibliographies
+          # tex: "main.tex"     # only check entries actually cited
+          # fail-on-error: "false"   # report but don't fail the check

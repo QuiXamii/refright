@@ -68,6 +68,25 @@ refright ref.bib --fix --write --fix-warnings   # also fix WARNING level (issue 
 
 The fixer edits field lines in place and never rewrites the file, so comments and formatting survive. By default it only touches ERROR-level fields and missing DOIs. Run refright again afterwards to confirm the fixes took.
 
+### GitHub Action
+
+refright doubles as a composite action. Add this to your paper repo as `.github/workflows/refright.yml`:
+
+```yaml
+name: refright
+on: [push, pull_request]
+permissions: {pull-requests: write, contents: read}
+jobs:
+  refright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - uses: QuiXamii/refright@main
+```
+
+That's it. Every push and PR gets its `.bib` files checked, pull requests get a summary comment, and the check goes red on any ERROR. Knobs: `files` (globs, default `**/*.bib`), `tex` (citation filtering), `workers`, `comment: "false"`, `fail-on-error: "false"`. See [examples/refright.yml](examples/refright.yml).
+
 ## What it catches
 
 | code | severity | meaning | auto-fix |

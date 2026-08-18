@@ -1,0 +1,20 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # the suites intentionally hit the live APIs; refright's cache
+      # is per-user so each CI run is a cold run (~1 min)
+      - run: python tests/run_golden.py
+      - run: python tests/test_fix.py
+      - run: python tests/test_tex.py
+      - run: python tests/test_bbl.py

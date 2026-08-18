@@ -58,6 +58,25 @@ refright ref.bib --fix --write --fix-warnings      # 连同 WARNING 级（如期
 
 修复只做外科手术式的修改：定点替换或插入字段行，绝不整体重写文件，注释和格式原样保留。默认只修 ERROR 级（错 DOI、错页码/卷号/年份）和 INFO 级 `missing-doi`（补 DOI），WARNING 级要显式加 `--fix-warnings`。原地写入必先创建时间戳备份，可以用备份完整回滚。修完建议再跑一次 `refright <bib>` 复查。
 
+### GitHub Action
+
+refright 本身也是一个 composite action。把下面这段存成论文仓库里的 `.github/workflows/refright.yml`：
+
+```yaml
+name: refright
+on: [push, pull_request]
+permissions: {pull-requests: write, contents: read}
+jobs:
+  refright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - uses: QuiXamii/refright@main
+```
+
+之后每次 push 和 PR 都会自动核查所有 `.bib`，PR 里会贴出汇总评论，任何条目有 ERROR 检查就会变红。可调参数：`files`（默认 `**/*.bib`）、`tex`（引用过滤）、`workers`、`comment: "false"`、`fail-on-error: "false"`。完整示例见 [examples/refright.yml](examples/refright.yml)。
+
 ## 能抓到什么
 
 | finding code                     | severity | 含义                                               | 可自动修复 |

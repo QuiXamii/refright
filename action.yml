@@ -1,0 +1,56 @@
+name: refright
+description: >-
+  Verify every reference in your .bib/.bbl against Crossref, OpenAlex, arXiv,
+  DBLP and DataCite. Comments a summary on pull requests; fails the check on
+  any ERROR (404 DOIs, wrong pages, mismatched arXiv IDs, …).
+author: WangQixiang
+branding:
+  icon: check-circle
+  color: green
+
+inputs:
+  files:
+    description: "Space-separated globs of .bib/.bbl files to check"
+    required: false
+    default: "**/*.bib"
+  tex:
+    description: "Space-separated .tex files/dirs for --tex citation filtering"
+    required: false
+    default: ""
+  workers:
+    description: "Concurrent verification workers"
+    required: false
+    default: "6"
+  comment:
+    description: "Comment the summary on the pull request"
+    required: false
+    default: "true"
+  fail-on-error:
+    description: "Fail the workflow when any entry has an ERROR"
+    required: false
+    default: "true"
+  token:
+    description: "Token used for PR comments"
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - name: Install refright
+      shell: bash
+      run: python3 -m pip install --quiet "${{ github.action_path }}"
+    - name: Verify references
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      env:
+        REFRIGHT_FILES: ${{ inputs.files }}
+        REFRIGHT_TEX: ${{ inputs.tex }}
+        REFRIGHT_WORKERS: ${{ inputs.workers }}
+        REFRIGHT_COMMENT: ${{ inputs.comment }}
+        REFRIGHT_FAIL_ON_ERROR: ${{ inputs.fail-on-error }}
+        REFRIGHT_TOKEN: ${{ inputs.token }}
+        REFRIGHT_REPO: ${{ github.repository }}
+        REFRIGHT_PR: ${{ github.event.pull_request.number }}
+        REFRIGHT_ACTION_PATH: ${{ github.action_path }}
+      run: bash "${{ github.action_path }}/action/run.sh"
