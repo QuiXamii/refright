@@ -95,6 +95,7 @@ jobs:
 | `unreliable-title-match`         | WARNING  | 标题反查命中但第一作者不符（可能同名不同论文）      | ❌          |
 | `doi-check-failed`               | WARNING  | 网络错误/限流导致核查失败（不是 404），建议重试     | ❌          |
 | `arxiv-check-failed`             | WARNING  | arXiv API 批量请求失败，无法确认编号，建议重试      | ❌          |
+| `dblp-check-failed`              | WARNING  | DBLP 不可达（故障/限流），无法确认，建议重试        | ❌          |
 | `year-online-first`              | WARNING  | 与在线首发年份差 1 年（可能是正式卷期年份）         | ❌          |
 | `missing-doi`                    | INFO     | 期刊论文缺 DOI（附建议值）                          | ✅          |
 | `doi-url-prefix`                 | INFO     | DOI 字段写成完整 URL，建议只留本体                  | ✅          |

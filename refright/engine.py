@@ -237,7 +237,13 @@ class Engine:
             return r
         # conference papers / other: DBLP first, Crossref fallback
         r.checked_by.extend(["dblp", "crossref-search"])
-        hit = self._dblp_lookup(e.title, e.fields.get("author", ""), e.fields.get("year", ""))
+        if not e.title.strip():
+            # no title to search by (some bbl styles omit it) — skipping the
+            # lookups keeps this outcome independent of source availability
+            r.findings.append(Finding(Severity.WARNING, "not-found-in-databases",
+                                      "not found in Crossref/DBLP; needs manual review"))
+            return r
+        hit, dblp_ok = self._dblp_lookup(e.title, e.fields.get("author", ""), e.fields.get("year", ""))
         if hit:
             url = hit.get("url", "")
             bp = norm_pages(e.fields.get("pages", ""))
@@ -255,6 +261,15 @@ class Engine:
                     "year does not match the DBLP record",
                     evidence=[FieldDiff("year", by, hy, "dblp", url)],
                     fix=FieldDiff("year", by, hy, "dblp", url)))
+            return r
+        if not dblp_ok:
+            # DBLP is the primary source for this entry class; degrading to a
+            # Crossref title lookup during an outage mostly surfaces reprints
+            # and edition noise. Say "couldn't check" instead of guessing.
+            r.findings.append(Finding(
+                Severity.WARNING, "dblp-check-failed",
+                "DBLP check request failed (network error / rate limit); cannot confirm — retry later",
+                evidence=[FieldDiff("dblp", e.title[:60], "request failed", "dblp", "")]))
             return r
         cand = self._reverse_lookup(e.title)
         if cand:
@@ -432,33 +447,39 @@ class Engine:
                     return cr
         return None
 
-    def _dblp_lookup(self, title: str, author: str = "", year: str = "") -> dict | None:
-        """Best DBLP hit for a title. DBLP keeps separate records per version
-        (conference vs journal reprint), so when several candidates pass the
-        title threshold the one closest to the bib year wins — otherwise a
-        famous paper's reprint (e.g. CACM 2017 vs NIPS 2012) false-alarms."""
+    def _dblp_lookup(self, title: str, author: str = "", year: str = "") -> tuple[dict | None, bool]:
+        """Best DBLP hit for a title, plus whether DBLP was reachable.
+        DBLP keeps separate records per version (conference vs journal
+        reprint), so when several candidates pass the title threshold the one
+        closest to the bib year wins — otherwise a famous paper's reprint
+        (e.g. CACM 2017 vs NIPS 2012) false-alarms."""
         queries = [title]
         sur = first_surname(author) if author else ""
         if sur:
             queries.append(f"{title} {sur}")  # DBLP ranks much better with a surname
         cands: list[tuple[float, dict]] = []
+        saw_error = False
         for q in queries:
-            for info in self.dblp.search(q):
+            res = self.dblp.search(q)
+            if res is None:
+                saw_error = True
+                continue
+            for info in res:
                 s = title_sim(title, info.get("title", ""))
                 if s >= TITLE_MATCH_THRESHOLD:
                     cands.append((s, info))
             if cands:
                 break
         if not cands:
-            return None
+            return None, not saw_error
         if year.isdigit():
             by = int(year)
             consistent = [c for c in cands
                           if str(c[1].get("year", "")).isdigit()
                           and abs(int(c[1]["year"]) - by) <= 1]
             if consistent:
-                return max(consistent, key=lambda c: c[0])[1]
-        return max(cands, key=lambda c: c[0])[1]
+                return max(consistent, key=lambda c: c[0])[1], True
+        return max(cands, key=lambda c: c[0])[1], True
 
 
 def entries_by_key(entries: list[BibEntry], key: str) -> BibEntry:

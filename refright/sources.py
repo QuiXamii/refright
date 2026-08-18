@@ -156,17 +156,19 @@ class DBLP:
         self.cache = cache
         self.limiter = RateLimiter(min_interval=0.5, max_concurrent=2)
 
-    def search(self, title: str, rows: int = 5) -> list[dict]:
+    def search(self, title: str, rows: int = 5) -> list[dict] | None:
+        """None = request failed (outage/rate limit); [] = genuine no-hit.
+        Callers must distinguish the two — an outage is not an empty index."""
         q = urllib.parse.quote_plus(re.sub(r"[^A-Za-z0-9 ]", " ", title))
         url = f"https://dblp.org/search/publ/api?q={q}&format=json&h={rows}"
         status, body = _http_get(url, self.cache, self.limiter)
         if status != "ok" or not body:
-            return []
+            return None
         try:
             hits = json.loads(body)["result"]["hits"].get("hit", [])
             return [h["info"] for h in hits]
         except Exception:
-            return []
+            return None
 
 
 class Arxiv:

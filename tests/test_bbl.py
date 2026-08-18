@@ -26,6 +26,10 @@ HERE = Path(__file__).parent
 TOOL = HERE.parent
 BBL = HERE / "golden" / "sample.bbl"
 
+# Infrastructure-level findings (a source was unreachable, not a bib problem).
+# Tolerated so a transient DBLP/arXiv/Crossref outage doesn't fail CI.
+INFRA_CODES = {"dblp-check-failed", "arxiv-check-failed", "doi-check-failed"}
+
 
 def main() -> int:
     ok = True
@@ -75,7 +79,8 @@ def main() -> int:
                 print(f"[bbl] expect exactly {sorted(expect_errors)}")
                 ok = False
             warns = {(r["key"], f["code"]) for r in data for f in r["findings"]
-                     if f["severity"] == "WARNING"}
+                     if f["severity"] == "WARNING"
+                     and f["code"] not in INFRA_CODES}
             if warns != {("zenke2017", "not-found-in-databases")}:
                 print(f"[bbl] unexpected WARNINGs: {sorted(warns)}")
                 ok = False

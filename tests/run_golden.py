@@ -21,6 +21,10 @@ BROKEN_ERRORS = {
     "Vaswani2017": "title-mismatch",
 }
 
+# Infrastructure-level findings (a source was unreachable, not a bib problem).
+# Tolerated so a transient DBLP/arXiv/Crossref outage doesn't fail CI.
+INFRA_CODES = {"dblp-check-failed", "arxiv-check-failed", "doi-check-failed"}
+
 
 def run(bib: Path) -> list[dict]:
     out = HERE / ".golden_out.json"
@@ -36,6 +40,11 @@ def main() -> int:
     ok = True
 
     fixed = run(HERE / "golden" / "ref_fixed.bib")
+    order = {"OK": 0, "INFO": 1, "WARNING": 2, "ERROR": 3}
+    for r in fixed:  # drop infrastructure-level findings before judging
+        r["findings"] = [f for f in r["findings"] if f["code"] not in INFRA_CODES]
+        r["severity"] = max((f["severity"] for f in r["findings"]),
+                            key=lambda s: order[s], default="OK")
     errs = [r for r in fixed if r["severity"] == "ERROR"]
     warns = [r for r in fixed if r["severity"] == "WARNING"]
     print(f"\n[fixed] errors={len(errs)} warnings={len(warns)} (expect 0/0)")

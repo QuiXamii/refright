@@ -103,7 +103,7 @@ That's it. Every push and PR gets its `.bib` files checked, pull requests get a 
 | `duplicate-key` | WARNING | the key is defined twice in the bib | ❌ |
 | `possible-version-mismatch` | WARNING | title lookup hit something >1 year off (reprint? edition?) | ❌ |
 | `unreliable-title-match` | WARNING | title lookup hit, but the first author doesn't match | ❌ |
-| `doi-check-failed` / `arxiv-check-failed` | WARNING | network/rate-limit failure, not a 404 — try again | ❌ |
+| `doi-check-failed` / `arxiv-check-failed` / `dblp-check-failed` | WARNING | network/rate-limit failure, not a 404 — try again | ❌ |
 | `year-online-first` | WARNING | 1 year off the online-first date (often fine) | ❌ |
 | `missing-doi` | INFO | journal article lacks a DOI (suggested value attached) | ✅ |
 | `doi-url-prefix` | INFO | DOI field holds a full URL instead of the bare DOI | ✅ |
