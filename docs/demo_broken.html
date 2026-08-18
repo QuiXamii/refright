@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>refright 核查报告 — ref_broken.bib</title>
+<style>
+:root{--err:#dc2626;--warn:#d97706;--info:#2563eb;--ok:#16a34a;--ink:#1f2937;--mut:#6b7280;--line:#e5e7eb;--bg:#f8fafc}
+*{box-sizing:border-box}body{margin:0;font:15px/1.6 -apple-system,"PingFang SC","Segoe UI",sans-serif;color:var(--ink);background:var(--bg)}
+header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:14px 24px;z-index:9}
+h1{font-size:20px;margin:0 0 4px}.meta{color:var(--mut);font-size:12.5px}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.chip{border:1.5px solid var(--line);border-radius:999px;padding:3px 14px;cursor:pointer;background:#fff;font-size:13.5px;font-weight:600;user-select:none}
+.chip.on[data-sev=error]{border-color:var(--err);color:var(--err)}.chip.on[data-sev=warning]{border-color:var(--warn);color:var(--warn)}
+.chip.on[data-sev=info]{border-color:var(--info);color:var(--info)}.chip.on[data-sev=ok]{border-color:var(--ok);color:var(--ok)}
+.chip.on[data-sev=all]{border-color:var(--ink)}
+#q{margin-top:10px;width:100%;max-width:420px;padding:6px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:14px}
+main{max-width:960px;margin:22px auto 60px;padding:0 20px}
+.card{background:#fff;border:1px solid var(--line);border-left:5px solid var(--ok);border-radius:10px;padding:14px 18px;margin:14px 0;box-shadow:0 1px 2px rgb(0 0 0/.04)}
+.card.sev-error{border-left-color:var(--err)}.card.sev-warning{border-left-color:var(--warn)}.card.sev-info{border-left-color:var(--info)}
+.chead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.key{font:600 15px ui-monospace,Menlo,monospace}
+.badge{font-size:11.5px;color:var(--mut);border:1px solid var(--line);border-radius:5px;padding:1px 7px}
+.sevchip{margin-left:auto;font-weight:700;font-size:13px}
+.sev-error>.chead>.sevchip{color:var(--err)}.sev-warning>.chead>.sevchip{color:var(--warn)}
+.sev-info>.chead>.sevchip{color:var(--info)}.sev-ok>.chead>.sevchip{color:var(--ok)}
+.title{margin:6px 0 2px;font-size:14.5px}.prov{font-size:12px;color:var(--mut);margin-top:4px}
+.bibmeta{font:12.5px ui-monospace,Menlo,monospace;color:var(--mut);margin-top:6px;background:#f9fafb;border-radius:6px;padding:6px 10px;overflow-x:auto;white-space:nowrap}
+.finding{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.fmsg{font-weight:600;font-size:14px}
+table.ev{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+table.ev th{background:#f3f4f6;text-align:left;padding:5px 9px;font-weight:600}
+table.ev td{border-top:1px solid var(--line);padding:5px 9px;vertical-align:top}
+table.ev code{font:12.5px ui-monospace,Menlo,monospace}
+td.bibv{color:#991b1b}td.refv{color:#065f46}
+.src{font-size:11.5px;border:1px solid var(--line);border-radius:5px;padding:0 6px;color:var(--mut);white-space:nowrap}
+a{color:var(--info);text-decoration:none}a:hover{text-decoration:underline}
+.sug{margin-top:8px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:8px 12px;font-size:13.5px}
+.fix{margin-top:10px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:9px 13px;font-size:14px}
+.fix .flabel{font-weight:700;font-size:13px;color:#92400e;margin-right:8px}
+.fix code{font:13px ui-monospace,Menlo,monospace;padding:1px 6px;border-radius:5px}
+.fix .old{color:#991b1b;background:#fee2e2;text-decoration:line-through}
+.fix .new{color:#166534;background:#dcfce7;font-weight:700}
+.fix .arrow{color:var(--mut);margin:0 6px;font-weight:700}
+.fix .fname{color:var(--mut);font-size:12.5px;margin-right:4px}
+.fix .note{color:var(--mut);font-size:12.5px;margin-top:5px}
+details.card summary{list-style:none;cursor:pointer}details.card summary::-webkit-details-marker{display:none}
+details.card summary::after{content:"▸ 展开核查细节";color:var(--mut);font-size:12px;margin-top:2px}
+details.card[open] summary::after{content:"▾ 收起"}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--mut);font-size:12px;margin:30px 0}
+</style></head><body>
+<header>
+  <h1>refright 参考文献核查报告</h1>
+  <div class="meta">文件: tests/golden/ref_broken.bib ・ 生成: 2026-08-18 20:17 ・ refright v0.2.0 ・ 数据源: Crossref / OpenAlex / arXiv / DBLP</div>
+  
+  <div class="chips">
+    <span class="chip on" data-sev="all" onclick="setSev('all',this)">全部 9</span>
+    <span class="chip" data-sev="error" onclick="setSev('error',this)">❌ 4</span>
+    <span class="chip" data-sev="warning" onclick="setSev('warning',this)">⚠️ 1</span>
+    <span class="chip" data-sev="info" onclick="setSev('info',this)">ℹ️ 1</span>
+    <span class="chip" data-sev="ok" onclick="setSev('ok',this)">✅ 3</span>
+  </div>
+  <input id="q" placeholder="按 bib key 或标题搜索…">
+</header>
+<main><section class="card sev-error" data-sev="error" data-key="lecun2015" data-title="deep learning"><div class="chead"><span class="key">LeCun2015</span><span class="badge">article</span><span class="sevchip">❌ ERROR</span></div><div class="title">Deep learning</div><div class="bibmeta">author=LeCun, Yann and Bengio, Yoshua and Hinton, Geoffrey  journal=Nature  volume=521  pages=436--444  year=2015  doi=10.1038/nature99999</div><div class="prov">核查来源: crossref</div><div class="finding"><div class="fmsg">❌ ERROR <code>[doi-unresolvable]</code> DOI 无法解析（HTTP 404）</div><table class="ev"><tr><th>字段</th><th>bib 中的值</th><th>数据库记录</th><th>来源</th><th>人工核实</th></tr><tr><td><code>doi</code></td><td class="bibv"><code>10.1038/nature99999</code></td><td class="refv"><code>HTTP 404 无法解析</code></td><td><span class="src">crossref</span></td><td><a href="https://doi.org/10.1038/nature99999" target="_blank" rel="noopener">核实 ↗</a></td></tr></table><div class="fix"><span class="flabel">🔧 建议修正</span><span class="fname">doi:</span><code class="old">10.1038/nature99999</code><span class="arrow">→</span><code class="new">10.1038/nature14539</code> <a href="https://doi.org/10.1038/nature14539" target="_blank" rel="noopener">核实 ↗</a><div class="note">💡 按标题反查到正确记录：Nature 521, 436-444 (2015)</div></div></div></section><section class="card sev-error" data-sev="error" data-key="shor1994" data-title="algorithms for quantum computation: discrete logarithms and factoring"><div class="chead"><span class="key">Shor1994</span><span class="badge">inproceedings</span><span class="sevchip">❌ ERROR</span></div><div class="title">Algorithms for quantum computation: discrete logarithms and factoring</div><div class="bibmeta">author=Shor, Peter W.  booktitle=Proceedings 35th Annual Symposium on Foundations of Computer Science  pages=125--134  year=1994  doi=10.1109/SFCS.1994.365700</div><div class="prov">核查来源: crossref</div><div class="finding"><div class="fmsg">❌ ERROR <code>[pages-mismatch]</code> 页码与出版方记录不符</div><div class="fix"><span class="flabel">🔧 建议修正</span><span class="fname">pages:</span><code class="old">125--134</code><span class="arrow">→</span><code class="new">124-134</code> <a href="https://doi.org/10.1109/SFCS.1994.365700" target="_blank" rel="noopener">核实 ↗</a><div class="note">数据源：crossref</div></div></div></section><section class="card sev-error" data-sev="error" data-key="rumelhart1986" data-title="learning representations by back-propagating errors"><div class="chead"><span class="key">Rumelhart1986</span><span class="badge">article</span><span class="sevchip">❌ ERROR</span></div><div class="title">Learning representations by back-propagating errors</div><div class="bibmeta">author=Rumelhart, David E. and Hinton, Geoffrey E. and Williams, Ronald J.  journal=Nature  volume=323  pages=533--539  year=1986  doi=10.1038/323533a0</div><div class="prov">核查来源: crossref</div><div class="finding"><div class="fmsg">❌ ERROR <code>[pages-mismatch]</code> 页码与出版方记录不符</div><div class="fix"><span class="flabel">🔧 建议修正</span><span class="fname">pages:</span><code class="old">533--539</code><span class="arrow">→</span><code class="new">533-536</code> <a href="https://doi.org/10.1038/323533a0" target="_blank" rel="noopener">核实 ↗</a><div class="note">数据源：crossref</div></div></div></section><section class="card sev-error" data-sev="error" data-key="vaswani2017" data-title="attention is all you need"><div class="chead"><span class="key">Vaswani2017</span><span class="badge">inproceedings</span><span class="sevchip">❌ ERROR</span></div><div class="title">Attention is all you need</div><div class="bibmeta">author=Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Lukasz and Polosukhin, Illia  booktitle=Advances in Neural Information Processing Systems  volume=30  pages=5998--6008  year=2017  doi=10.1126/science.aaa8415</div><div class="prov">核查来源: crossref</div><div class="finding"><div class="fmsg">❌ ERROR <code>[title-mismatch]</code> DOI 指向的论文与条目标题不符（DOI 可能张冠李戴）</div><table class="ev"><tr><th>字段</th><th>bib 中的值</th><th>数据库记录</th><th>来源</th><th>人工核实</th></tr><tr><td><code>title</code></td><td class="bibv"><code>Attention is all you need</code></td><td class="refv"><code>Machine learning: Trends, perspectives, and prospects</code></td><td><span class="src">crossref</span></td><td><a href="https://doi.org/10.1126/science.aaa8415" target="_blank" rel="noopener">核实 ↗</a></td></tr></table></div></section><section class="card sev-warning" data-sev="warning" data-key="hoeffding1963" data-title="probability inequalities for sums of bounded random variables"><div class="chead"><span class="key">Hoeffding1963</span><span class="badge">article</span><span class="sevchip">⚠️ WARNING</span></div><div class="title">Probability inequalities for sums of bounded random variables</div><div class="bibmeta">author=Hoeffding, Wassily  journal=Journal of the American Statistical Association  volume=58  pages=13--30  year=1963  doi=10.1080/01621459.1963.10500830</div><div class="prov">核查来源: crossref</div><div class="finding"><div class="fmsg">⚠️ WARNING <code>[issue-mismatch]</code> 期号与出版方记录不符</div><div class="fix"><span class="flabel">🔧 建议修正</span><span class="fname">number:</span><code class="old">302</code><span class="arrow">→</span><code class="new">301</code> <a href="https://doi.org/10.1080/01621459.1963.10500830" target="_blank" rel="noopener">核实 ↗</a><div class="note">数据源：crossref</div></div></div></section><section class="card sev-info" data-sev="info" data-key="jordan2015" data-title="machine learning: trends, perspectives, and prospects"><div class="chead"><span class="key">Jordan2015</span><span class="badge">article</span><span class="sevchip">ℹ️ INFO</span></div><div class="title">Machine learning: Trends, perspectives, and prospects</div><div class="bibmeta">author=Jordan, Michael I. and Mitchell, Tom M.  journal=Science  volume=349  pages=255--260  year=2015</div><div class="prov">核查来源: crossref-search</div><div class="finding"><div class="fmsg">ℹ️ INFO <code>[missing-doi]</code> 期刊论文缺少 DOI 字段</div><div class="fix"><span class="flabel">🔧 建议修正</span><span class="fname">doi:</span><code class="old">(缺失)</code><span class="arrow">→</span><code class="new">10.1126/science.aaa8415</code> <a href="https://doi.org/10.1126/science.aaa8415" target="_blank" rel="noopener">核实 ↗</a><div class="note">💡 按标题匹配到记录：Science 349, 255-260 (2015)</div></div></div></section><details class="card sev-ok" data-sev="ok" data-key="breiman2001" data-title="random forests"><summary><div class="chead"><span class="key">Breiman2001</span><span class="badge">article</span><span class="sevchip">✅ OK</span></div><div class="title">Random forests</div></summary><div class="bibmeta">author=Breiman, Leo  journal=Machine Learning  volume=45  pages=5--32  year=2001  doi=10.1023/A:1010933404324</div><div class="prov">核查来源: crossref</div></details><details class="card sev-ok" data-sev="ok" data-key="kingma2015" data-title="adam: a method for stochastic optimization"><summary><div class="chead"><span class="key">Kingma2015</span><span class="badge">misc</span><span class="sevchip">✅ OK</span></div><div class="title">Adam: A method for stochastic optimization</div></summary><div class="bibmeta">author=Kingma, Diederik P. and Ba, Jimmy  year=2015</div><div class="prov">核查来源: arxiv</div></details><details class="card sev-ok" data-sev="ok" data-key="bommasani2021" data-title="on the opportunities and risks of foundation models"><summary><div class="chead"><span class="key">Bommasani2021</span><span class="badge">article</span><span class="sevchip">✅ OK</span></div><div class="title">On the opportunities and risks of foundation models</div></summary><div class="bibmeta">author=Bommasani, Rishi and Hudson, Drew A. and Adeli, Ehsan and others  journal=arXiv:2108.07258  year=2021</div><div class="prov">核查来源: arxiv</div></details></main>
+<footer>证据表中 <span style="color:#991b1b">红色 = bib 当前值</span>，<span style="color:#065f46">绿色 = 数据库记录值</span> ・ 每条结论可点击"核实 ↗"跳转出版方/数据库页面人工复核 ・ 由 refright 自动生成</footer>
+<script>
+let sev='all';
+function setSev(s,el){sev=s;document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');apply();}
+function apply(){
+  const q=document.getElementById('q').value.toLowerCase();
+  document.querySelectorAll('main .card').forEach(c=>{
+    const okSev=(sev==='all'||c.dataset.sev===sev);
+    const okQ=(!q||c.dataset.key.includes(q)||(c.dataset.title||'').includes(q));
+    c.classList.toggle('hidden',!(okSev&&okQ));});
+}
+document.getElementById('q').addEventListener('input',apply);
+</script>
+</body></html>

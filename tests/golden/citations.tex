@@ -1,0 +1,7 @@
+% 测试 --tex 过滤功能：只核查正文实际引用的条目
+\documentclass{article}
+\begin{document}
+引用两条真实文献 \cite{LeCun2015, Shor1994}，以及 \citep{Vaswani2017}。
+还引用了一个 bib 中不存在的 key \cite{GhostKey2099}。
+% 注释里的 \cite{CommentedOutKey} 不应被统计
+\end{document}

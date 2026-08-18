@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "refright"
+version = "0.2.0"
+description = "Verify the authenticity of every reference in .bib/.bbl files against Crossref, OpenAlex, arXiv, DBLP and DataCite."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
+[project.scripts]
+refright = "refright.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["refright*"]

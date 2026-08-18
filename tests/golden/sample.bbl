@@ -1,0 +1,30 @@
+% Synthetic .bbl fixture (REVTeX/apsrev4-1 style + one plain entry).
+% All entries describe famous public papers; two carry planted errors:
+%   gpt4report      arXiv link points to a different paper -> arxiv-id-mismatch ERROR
+%   gao2018quantum  article number lost its leading 'e'    -> pages-mismatch ERROR
+%   zenke2017       title omitted by the bbl style         -> not-found-in-databases WARNING
+\begin{thebibliography}{7}%
+\providecommand \doibase [0]{http://dx.doi.org/}%
+\bibitem [{\citenamefont {LeCun}\ \emph {et~al.}(2015)\citenamefont {LeCun}, \citenamefont {Bengio},\ and\ \citenamefont {Hinton}}]{lecun2015deep}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {Y.}~\bibnamefont {LeCun}}, \bibinfo {author} {\bibfnamefont {Y.}~\bibnamefont {Bengio}}, \ and\ \bibinfo {author} {\bibfnamefont {G.}~\bibnamefont {Hinton}},\ }\bibfield  {title} {Deep learning,\ }\href {\doibase 10.1038/nature14539} {\bibfield  {journal} {\bibinfo  {journal} {Nature}\ }\textbf {\bibinfo {volume} {521}},\ \bibinfo {pages} {436} (\bibinfo {year} {2015})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Shor}(1994)}]{shor1994}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {P.~W.}\ \bibnamefont {Shor}},\ }\bibfield  {title} {Algorithms for quantum computation: discrete logarithms and factoring,\ }\href {\doibase 10.1109/SFCS.1994.365700} {\bibinfo {booktitle} {Proceedings 35th Annual Symposium on Foundations of Computer Science},\ \bibinfo {pages} {124--134} (\bibinfo {year} {1994})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {OpenAI}(2023)}]{gpt4report}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibnamefont {OpenAI}},\ }\bibfield  {title} {GPT-4 technical report,\ }\href {https://arxiv.org/abs/2108.07258} {\bibfield  {journal} {\bibinfo  {journal} {arXiv:2303.08774}\ } (\bibinfo {year} {2023})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Gao}\ \emph {et~al.}(2018)\citenamefont {Gao}, \citenamefont {Zhang},\ and\ \citenamefont {Duan}}]{gao2018quantum}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {X.}~\bibnamefont {Gao}}, \bibinfo {author} {\bibfnamefont {Z.-Y.}\ \bibnamefont {Zhang}}, \ and\ \bibinfo {author} {\bibfnamefont {L.-M.}\ \bibnamefont {Duan}},\ }\bibfield  {title} {A quantum machine learning algorithm based on generative models,\ }\href {\doibase 10.1126/sciadv.aat9004} {\bibfield  {journal} {\bibinfo  {journal} {Science Advances}\ }\textbf {\bibinfo {volume} {4}},\ \bibinfo {pages} {aat9004} (\bibinfo {year} {2018})}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Chaudhry}\ \emph {et~al.}(2018)\citenamefont {Chaudhry}, \citenamefont {Dokania}, \citenamefont {Ajanthan},\ and\ \citenamefont {Torr}}]{chaudhry2018}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {A.}~\bibnamefont {Chaudhry}}, \bibinfo {author} {\bibfnamefont {P.~K.}\ \bibnamefont {Dokania}}, \bibinfo {author} {\bibfnamefont {T.}~\bibnamefont {Ajanthan}}, \ and\ \bibinfo {author} {\bibfnamefont {P.~H.~S.}\ \bibnamefont {Torr}},\ }Riemannian walk for incremental learning: Understanding forgetting and intransigence\ (\bibinfo {year} {2018})\ pp.\ \bibinfo {pages} {556--572}\BibitemShut {NoStop}%
+\bibitem [{\citenamefont {Zenke}\ \emph {et~al.}(2017)\citenamefont {Zenke}, \citenamefont {Poole},\ and\ \citenamefont {Ganguli}}]{zenke2017}%
+  \BibitemOpen
+  \bibfield  {author} {\bibinfo {author} {\bibfnamefont {F.}~\bibnamefont {Zenke}}, \bibinfo {author} {\bibfnamefont {B.}~\bibnamefont {Poole}}, \ and\ \bibinfo {author} {\bibfnamefont {S.}~\bibnamefont {Ganguli}},\ }in\ {\bibinfo {booktitle} {Proceedings of the 34th International Conference on Machine Learning - Volume 70}}\ (\bibinfo {year} {2017})\ p.\ \bibinfo {pages} {3987--3995}\BibitemShut {NoStop}%
+\bibitem{krizhevsky2012}
+  A. Krizhevsky, I. Sutskever, and G.~E. Hinton, \emph{ImageNet classification with
+  deep convolutional neural networks}, Adv. Neural Inf. Process. Syst. \textbf{25},
+  1097--1105 (2012).
+\end{thebibliography}

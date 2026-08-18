@@ -1,0 +1,92 @@
+% Synthetic broken fixture — same entries as ref_fixed.bib but with planted
+% errors (all detectable against public records):
+%   LeCun2015    wrong DOI (404; reverse lookup should suggest 10.1038/nature14539)
+%   Jordan2015   DOI field removed           -> missing-doi INFO
+%   Shor1994     pages 125--134 (true 124)   -> pages-mismatch ERROR
+%   Hoeffding1963 issue 302 (true 301)       -> issue-mismatch WARNING
+%   Rumelhart1986 pages 533--539 (true 536)  -> pages-mismatch ERROR
+%   Vaswani2017  planted DOI of a Science paper -> title-mismatch ERROR
+
+@article{LeCun2015,
+  author  = {LeCun, Yann and Bengio, Yoshua and Hinton, Geoffrey},
+  title   = {Deep learning},
+  journal = {Nature},
+  volume  = {521},
+  pages   = {436--444},
+  year    = {2015},
+  doi     = {10.1038/nature99999},
+}
+
+@article{Jordan2015,
+  author  = {Jordan, Michael I. and Mitchell, Tom M.},
+  title   = {Machine learning: Trends, perspectives, and prospects},
+  journal = {Science},
+  volume  = {349},
+  number  = {6245},
+  pages   = {255--260},
+  year    = {2015},
+}
+
+@inproceedings{Shor1994,
+  author    = {Shor, Peter W.},
+  title     = {Algorithms for quantum computation: discrete logarithms and factoring},
+  booktitle = {Proceedings 35th Annual Symposium on Foundations of Computer Science},
+  pages     = {125--134},
+  year      = {1994},
+  doi       = {10.1109/SFCS.1994.365700},
+}
+
+@article{Hoeffding1963,
+  author  = {Hoeffding, Wassily},
+  title   = {Probability inequalities for sums of bounded random variables},
+  journal = {Journal of the American Statistical Association},
+  volume  = {58},
+  number  = {302},
+  pages   = {13--30},
+  year    = {1963},
+  doi     = {10.1080/01621459.1963.10500830},
+}
+
+@article{Rumelhart1986,
+  author  = {Rumelhart, David E. and Hinton, Geoffrey E. and Williams, Ronald J.},
+  title   = {Learning representations by back-propagating errors},
+  journal = {Nature},
+  volume  = {323},
+  pages   = {533--539},
+  year    = {1986},
+  doi     = {10.1038/323533a0},
+}
+
+@article{Breiman2001,
+  author  = {Breiman, Leo},
+  title   = {Random forests},
+  journal = {Machine Learning},
+  volume  = {45},
+  pages   = {5--32},
+  year    = {2001},
+  doi     = {10.1023/A:1010933404324},
+}
+
+@misc{Kingma2015,
+  author = {Kingma, Diederik P. and Ba, Jimmy},
+  title  = {Adam: A method for stochastic optimization},
+  eprint = {1412.6980},
+  year   = {2015},
+}
+
+@inproceedings{Vaswani2017,
+  author    = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, Lukasz and Polosukhin, Illia},
+  title     = {Attention is all you need},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  pages     = {5998--6008},
+  year      = {2017},
+  doi       = {10.1126/science.aaa8415},
+}
+
+@article{Bommasani2021,
+  author  = {Bommasani, Rishi and Hudson, Drew A. and Adeli, Ehsan and others},
+  title   = {On the opportunities and risks of foundation models},
+  journal = {arXiv:2108.07258},
+  year    = {2021},
+}

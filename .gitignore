@@ -1,0 +1,7 @@
+__pycache__/
+*.egg-info/
+.DS_Store
+*.bak
+.golden_out.json
+*_refright_report.html
+tests/golden/ref_broken_report.html
